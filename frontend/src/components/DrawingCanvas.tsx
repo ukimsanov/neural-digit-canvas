@@ -14,12 +14,20 @@ export interface DrawingCanvasRef {
   isEmpty: () => boolean;
 }
 
+// Helper function to calculate line width based on canvas size and thickness setting
+const getLineWidth = (canvasSize: number, thickness: number): number => {
+  const baseWidth = canvasSize / 20;
+  const multiplier = 0.5 + (thickness - 1) * 0.3; // Thickness 1-5 maps to 0.5x-1.7x multiplier
+  return baseWidth * multiplier;
+};
+
 const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
   ({ className, onDrawingChange }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const [isEmpty, setIsEmpty] = useState(true);
+    const [brushThickness, setBrushThickness] = useState(3); // Default thickness level (1-5)
 
     useEffect(() => {
       const canvas = canvasRef.current;
@@ -37,12 +45,19 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.strokeStyle = 'black';
-      ctx.lineWidth = size / 20; // Responsive line width
+      ctx.lineWidth = getLineWidth(size, brushThickness);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
       setContext(ctx);
-    }, []);
+    }, [brushThickness]);
+
+    // Update line width when brush thickness changes
+    useEffect(() => {
+      if (context && canvasRef.current) {
+        context.lineWidth = getLineWidth(canvasRef.current.width, brushThickness);
+      }
+    }, [context, brushThickness]);
 
     useImperativeHandle(ref, () => ({
       clear: () => {
@@ -99,6 +114,27 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
 
     return (
       <div className={cn('relative flex flex-col items-center', className)}>
+        {/* Brush thickness control */}
+        <div className="mb-4 flex items-center gap-3 p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg">
+          <label htmlFor="brush-thickness" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            Brush Size:
+          </label>
+          <input
+            id="brush-thickness"
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value={brushThickness}
+            onChange={(e) => setBrushThickness(Number(e.target.value))}
+            className="w-20 h-2 bg-gradient-to-r from-blue-200 to-blue-400 rounded-lg appearance-none cursor-pointer slider"
+            aria-label="Adjust brush thickness"
+          />
+          <span className="text-sm text-gray-600 min-w-[20px] text-center font-mono">
+            {brushThickness}
+          </span>
+        </div>
+
         <canvas
           ref={canvasRef}
           className="border-4 border-blue-500 rounded-2xl cursor-crosshair touch-none bg-white shadow-lg max-w-full"
