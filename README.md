@@ -29,9 +29,9 @@ Production Pipeline: Research → Development → Testing → Deployment → Mon
 - **Comparative Analysis**: Head-to-head performance benchmarking
 
 **🌐 Full-Stack Implementation**
-- **Interactive Web App**: Modern Gradio interface with real-time inference
+- **Interactive Web App**: Modern Next.js frontend with real-time digit drawing and prediction
 - **REST API**: FastAPI service with auto-generated OpenAPI docs
-- **Docker Orchestration**: Complete containerization with docker-compose
+- **Modern UI/UX**: Beautiful animations, responsive design, and brush thickness controls
 - **CI/CD Pipeline**: Automated testing across Python 3.8-3.11
 
 **📊 Professional ML Workflow**
@@ -52,19 +52,20 @@ cd mnist-linear-classifier
 # One-command setup and training
 make install && make train
 
-# Launch interactive demo
-make demo
-# 🌐 Opens at http://localhost:7860
+# Launch full application (API + Frontend)
+make run
+# 🌐 Frontend: http://localhost:3000
+# 📡 API docs: http://localhost:8000/docs
 
-# Or start the REST API
-make api  
-# 📡 API docs at http://localhost:8000/docs
+# Or start services individually
+make api      # Just the API server
+make frontend # Just the Next.js frontend
 ```
 
 **🐳 Prefer Docker?**
 ```bash
 docker-compose up --build
-# Everything runs automatically: training + web demo + API
+# Everything runs automatically: API + Next.js frontend
 ```
 
 ## � Performance Benchmarks
@@ -122,15 +123,15 @@ make train     # Trains both models (~5 minutes)
 
 **🔧 Development Setup**
 ```bash
-make install-dev  # Includes testing and linting tools
-make test        # Run full test suite
-make lint        # Code quality checks
+make install     # Install dependencies
+make clean       # Clean cache files
+python -m pytest tests/ # Run test suite (if you have tests)
 ```
 
 **🐳 Docker Deployment**
 ```bash
 docker-compose up --build
-# Automatically handles: dependencies, training, and service startup
+# Automatically handles: API + Next.js frontend services
 ```
 
 ## 🎮 Usage Examples
@@ -148,11 +149,12 @@ python train.py --model cnn --epochs 20 --lr 0.001 --optimizer adamw --dropout 0
 python train.py --model linear --epochs 5
 ```
 
-### **🌐 Interactive Web Demo**
+### **🌐 Interactive Web Application**
 ```bash
-make demo
-# 🎨 Draw digits in your browser at http://localhost:7860
-# ✨ Real-time predictions with confidence visualization
+make run
+# 🎨 Modern Next.js app at http://localhost:3000
+# ✨ Draw digits with brush thickness control
+# 🚀 Beautiful animations and real-time predictions
 ```
 
 ### **🔌 REST API Service**
@@ -204,9 +206,11 @@ mnist-linear-classifier/
 │   └── cnn/                     # CNN model checkpoints  
 ├── 🗃️ data/MNIST/               # Dataset storage
 ├── 🎯 train.py                  # CLI training interface
-├── 🔍 inference.py              # Single image prediction
-├── 🎨 app.py                    # Interactive Gradio web demo
 ├── 🌐 api.py                    # FastAPI REST service
+├── 🎨 frontend/                 # Next.js web application
+│   ├── src/app/                 # Next.js 15 app router
+│   ├── src/components/          # React components
+│   └── public/                  # Static assets
 ├── 🐳 Dockerfile & docker-compose.yml  # Container orchestration
 ├── ⚙️ Makefile                  # Development automation
 └── 🔄 .github/workflows/        # CI/CD automation
@@ -229,6 +233,23 @@ mnist-linear-classifier/
 | `/predict` | POST | Image upload prediction | Prediction with confidence |
 | `/predict/base64` | POST | Base64 image prediction | Same as above |
 | `/model/{type}/info` | GET | Model architecture details | Parameters, accuracy, etc. |
+
+### **🎨 Frontend Features**
+
+**Modern Next.js 15 Application:**
+- **Real-time Drawing Canvas**: Interactive digit drawing with touch/mouse support
+- **Brush Thickness Control**: Adjustable brush size (1-5) for different drawing styles  
+- **Model Selection**: Switch between CNN and Linear models with live accuracy display
+- **Beautiful Animations**: Smooth entrance animations and micro-interactions
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Live API Status**: Real-time connection status indicator
+- **Glassmorphism UI**: Modern frosted glass effects and gradients
+
+**Technical Stack:**
+- Next.js 15 with App Router
+- React 19 with TypeScript
+- Tailwind CSS v4 for styling
+- Custom CSS animations for 2025 design trends
 
 ### **Python Package API** 
 
@@ -271,10 +292,9 @@ curl -X POST "http://localhost:8000/predict" \
 
 ### **Testing Pipeline**
 ```bash
-make test           # Full test suite with coverage report
-make test-coverage  # Detailed coverage analysis  
-make lint          # Code quality and style checks
-make format        # Auto-format code with Black
+python -m pytest tests/ -v        # Run test suite
+python -m pytest tests/ --cov     # With coverage report
+make clean                         # Clean cache files
 ```
 
 ### **Test Coverage**
@@ -295,7 +315,7 @@ make format        # Auto-format code with Black
 ### **One-Command Deployment**
 ```bash
 docker-compose up --build
-# 🚀 Automatically starts: web demo (port 7860) + REST API (port 8000)
+# 🚀 Automatically starts: Next.js frontend (port 3000) + REST API (port 8000)
 ```
 
 ### **Service Management**
@@ -393,7 +413,7 @@ All contributions will be reviewed for code quality and alignment with project g
 - **`src/mnist_classifier/models/`**: Study model implementations to understand PyTorch architecture patterns
 - **`train.py`**: See how modern training loops handle validation, checkpointing, and metrics
 - **`api.py`**: Learn FastAPI patterns for ML model serving
-- **`app.py`**: Explore Gradio for rapid ML demo development
+- **`frontend/`**: Explore Next.js 15 with React 19 for modern ML interfaces
 - **`.github/workflows/`**: Examine CI/CD best practices for ML projects
 
 ### **Key Concepts Demonstrated**
@@ -406,7 +426,7 @@ All contributions will be reviewed for code quality and alignment with project g
 
 - **PyTorch**: Exceptional deep learning framework enabling rapid development
 - **MNIST Dataset**: Classic benchmark by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges  
-- **Gradio**: Streamlined ML demo creation for interactive experiences
+- **Next.js + React**: Modern frontend stack for beautiful, interactive ML demos
 - **FastAPI**: Modern, fast web framework perfect for ML APIs
 
 ## 📄 License
