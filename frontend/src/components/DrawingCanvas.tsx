@@ -98,7 +98,7 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
     };
 
     return (
-      <div className={cn('relative', className)}>
+      <div className={cn('relative flex flex-col items-center', className)}>
         <canvas
           ref={canvasRef}
           className="border-4 border-blue-500 rounded-2xl cursor-crosshair touch-none bg-white shadow-lg max-w-full"
@@ -119,7 +119,7 @@ const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(
             }
           }}
         />
-        <div className="absolute -bottom-10 sm:-bottom-12 left-0 right-0 text-center text-xs sm:text-sm text-gray-500 leading-tight">
+        <div className="mt-4 text-center text-xs sm:text-sm text-gray-500 leading-tight">
           Draw a digit (0-9)
         </div>
       </div>

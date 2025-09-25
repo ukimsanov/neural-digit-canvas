@@ -102,95 +102,101 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 sm:mb-4 leading-tight">
-            Draw a Digit, Watch AI Predict
-          </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
-            Experience the power of neural networks. Draw any digit from 0-9 and watch our
-            trained models recognize it in real-time with confidence scores.
-          </p>
-        </div>
-
-        {/* API Offline Warning */}
-        {apiStatus === 'offline' && (
-          <div className="mb-4 sm:mb-6 p-4 bg-red-50 border border-red-200 rounded-xl" role="alert" aria-live="polite">
-            <p className="text-red-700 text-sm sm:text-base">
-              ⚠️ API is offline. Please start the FastAPI backend server:
-              <code className="ml-2 px-2 py-1 bg-red-100 rounded text-xs sm:text-sm font-mono">python api.py</code>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24">
+          <div className="text-center mb-16 sm:mb-20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-blue-200/50 text-sm font-medium text-blue-700 mb-6 sm:mb-8">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              Neural Network Demo • Try It Live
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 leading-tight tracking-tight">
+              Draw a Digit,
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Watch AI Predict
+              </span>
+            </h1>
+            
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8 sm:mb-12">
+              Experience machine learning in real-time. Choose between our CNN model (98.2% accuracy) 
+              or Linear classifier (92.4% accuracy), draw any digit, and see instant predictions.
             </p>
           </div>
-        )}
 
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
-          {/* Left Column - Drawing Area */}
-          <div className="space-y-4 sm:space-y-6">
-            {/* Model Selector */}
-            <ModelSelector
-              selectedModel={selectedModel}
-              onModelChange={setSelectedModel}
-            />
+          {/* Integrated Demo Section */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-purple-600/10 rounded-3xl blur-3xl transform -rotate-1"></div>
+            <div className="relative bg-white/90 backdrop-blur-md rounded-3xl border border-white/50 shadow-2xl p-6 sm:p-8">
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Left Column - Interactive Demo */}
+                <div className="space-y-6">
+                  <ModelSelector
+                    selectedModel={selectedModel}
+                    onModelChange={setSelectedModel}
+                  />
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+                      Draw Your Digit
+                    </h3>
+                    <div className="mb-8">
+                      <DrawingCanvas
+                        ref={canvasRef}
+                        onDrawingChange={() => {
+                          setPrediction(null);
+                          setError(null);
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button
+                        onClick={handleClear}
+                        aria-label="Clear the drawing canvas"
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 min-h-[48px]"
+                      >
+                        <Eraser className="w-5 h-5" />
+                        Clear
+                      </button>
+                      <button
+                        onClick={handlePredict}
+                        disabled={isLoading || apiStatus === 'offline'}
+                        aria-label={`Predict digit using ${selectedModel} model`}
+                        className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[48px]"
+                      >
+                        <Sparkles className="w-5 h-5" />
+                        {isLoading ? 'Predicting...' : 'Predict'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Drawing Canvas */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-100">
-              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6 text-center leading-tight">
-                Draw Your Digit
-              </h3>
-
-              <div className="flex justify-center mb-12 sm:mb-16">
-                <DrawingCanvas
-                  ref={canvasRef}
-                  onDrawingChange={() => {
-                    setPrediction(null);
-                    setError(null);
-                  }}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-4 sm:mt-6">
-                <button
-                  onClick={handleClear}
-                  aria-label="Clear the drawing canvas"
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 min-h-[48px] touch-manipulation"
-                >
-                  <Eraser className="w-5 h-5" />
-                  Clear
-                </button>
-                <button
-                  onClick={handlePredict}
-                  disabled={isLoading || apiStatus === 'offline'}
-                  aria-label={`Predict digit using ${selectedModel} model`}
-                  aria-describedby={isLoading ? 'prediction-status' : undefined}
-                  className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[48px] touch-manipulation"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  {isLoading ? 'Predicting...' : 'Predict'}
-                </button>
-                {isLoading && (
-                  <span id="prediction-status" className="sr-only">
-                    Making prediction with {selectedModel} model
-                  </span>
-                )}
+                {/* Right Column - Results */}
+                <div>
+                  <PredictionResult
+                    prediction={prediction}
+                    isLoading={isLoading}
+                    error={error}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Results */}
-          <div>
-            <PredictionResult
-              prediction={prediction}
-              isLoading={isLoading}
-              error={error}
-            />
-          </div>
-        </div>
+          {/* API Offline Warning */}
+          {apiStatus === 'offline' && (
+            <div className="mb-4 sm:mb-6 p-4 bg-red-50 border border-red-200 rounded-xl" role="alert" aria-live="polite">
+              <p className="text-red-700 text-sm sm:text-base">
+                ⚠️ API is offline. Please start the FastAPI backend server:
+                <code className="ml-2 px-2 py-1 bg-red-100 rounded text-xs sm:text-sm font-mono">python api.py</code>
+              </p>
+            </div>
+          )}
 
-        {/* Info Section */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12">
+          {/* Info Section */}
+          <div className="mt-16 sm:mt-20 lg:mt-24 mb-8 sm:mb-12">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border border-gray-100">
             <h3 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base leading-tight">🎯 High Accuracy</h3>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
@@ -211,12 +217,19 @@ export default function Home() {
               Choose between a fast linear classifier (92.4%) or a more accurate CNN (98.2%),
               each optimized for different use cases.
             </p>
+            </div>
           </div>
         </div>
-      </main>
+
+        </div>
+
+        {/* Decorative elements */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-xl"></div>
+      </section>
 
       {/* Footer */}
-      <footer className="mt-12 sm:mt-16 bg-white/80 backdrop-blur-md border-t border-gray-200">
+      <footer className="mt-12 sm:mt-16 bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="text-center text-gray-600">
             <p className="mb-2 text-sm sm:text-base leading-relaxed">

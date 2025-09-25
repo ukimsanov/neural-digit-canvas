@@ -33,7 +33,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
   ];
 
   return (
-    <div className={cn('bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100', className)}>
+    <div className={cn('bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100/50', className)}>
       <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Select Model</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {models.map((model) => {

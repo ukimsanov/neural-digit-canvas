@@ -15,7 +15,7 @@ interface PredictionResultProps {
 const PredictionResult: React.FC<PredictionResultProps> = ({ prediction, isLoading, error }) => {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-100">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-gray-100/50">
         <div className="animate-pulse" role="status" aria-label="Loading prediction">
           <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
           <div className="h-48 sm:h-64 bg-gray-200 rounded"></div>
@@ -27,7 +27,7 @@ const PredictionResult: React.FC<PredictionResultProps> = ({ prediction, isLoadi
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-red-100" role="alert">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-red-100/50" role="alert">
         <div className="flex items-center gap-3 text-red-600 mb-4">
           <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" aria-hidden="true" />
           <h3 className="text-lg sm:text-xl font-semibold leading-tight">Prediction Error</h3>
@@ -39,7 +39,7 @@ const PredictionResult: React.FC<PredictionResultProps> = ({ prediction, isLoadi
 
   if (!prediction) {
     return (
-      <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-100">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-gray-100/50">
         <div className="text-center text-gray-500">
           <div className="mb-4">
             <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
@@ -77,7 +77,7 @@ const PredictionResult: React.FC<PredictionResultProps> = ({ prediction, isLoadi
   };
 
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-100">
+    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-gray-100/50">
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
