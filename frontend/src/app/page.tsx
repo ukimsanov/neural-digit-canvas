@@ -16,11 +16,16 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
-  // Check API status on mount
+  // Check API status after header animation completes
   useEffect(() => {
-    mnistAPI.healthCheck()
-      .then(() => setApiStatus('online'))
-      .catch(() => setApiStatus('offline'));
+    // Delay API check until after header animation (0.8s) completes
+    const timer = setTimeout(() => {
+      mnistAPI.healthCheck()
+        .then(() => setApiStatus('online'))
+        .catch(() => setApiStatus('offline'));
+    }, 1000); // Wait 1 second to ensure animation is complete
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handlePredict = async () => {
@@ -61,7 +66,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 animate-in slide-in-from-top duration-700 ease-out">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 hero-header">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -77,15 +82,17 @@ export default function Home() {
             <div className="flex items-center gap-2 sm:gap-4">
               {/* API Status Indicator */}
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <Activity className={`w-4 h-4 ${
+                <Activity className={`w-4 h-4 transition-colors duration-300 ${
                   apiStatus === 'online' ? 'text-green-500' :
                   apiStatus === 'offline' ? 'text-red-500' :
                   'text-gray-400 animate-pulse'
                 }`} aria-hidden="true" />
-                <span className="text-xs sm:text-sm text-gray-600">
+                <div className="text-xs sm:text-sm text-gray-600 min-w-[65px] sm:min-w-[85px] text-left">
                   <span className="hidden sm:inline">API </span>
-                  {apiStatus === 'online' ? 'Online' : apiStatus === 'offline' ? 'Offline' : 'Checking...'}
-                </span>
+                  <span className="transition-all duration-300 ease-out">
+                    {apiStatus === 'online' ? 'Online' : apiStatus === 'offline' ? 'Offline' : 'Checking...'}
+                  </span>
+                </div>
               </div>
 
               <a
@@ -106,13 +113,13 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24">
-          <div className="text-center mb-16 sm:mb-20 animate-in fade-in slide-in-from-bottom duration-1000 ease-out">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-blue-200/50 text-sm font-medium text-blue-700 mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom duration-700 ease-out delay-300 hover:scale-105 hover:shadow-lg transition-transform">
+          <div className="text-center mb-16 sm:mb-20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-blue-200/50 text-sm font-medium text-blue-700 mb-6 sm:mb-8 hero-badge hover:scale-105 hover:shadow-lg transition-transform">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               Neural Network Demo • Try It Live
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 leading-tight tracking-tight animate-in fade-in slide-in-from-bottom duration-1000 ease-out delay-500">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 leading-tight tracking-tight hero-title">
               Draw a Digit,
               <br />
               <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
@@ -120,14 +127,14 @@ export default function Home() {
               </span>
             </h1>
             
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom duration-1000 ease-out delay-700">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8 sm:mb-12 hero-description">
               Experience machine learning in real-time. Choose between our CNN model (98.2% accuracy) 
               or Linear classifier (92.4% accuracy), draw any digit, and see instant predictions.
             </p>
           </div>
 
           {/* Integrated Demo Section */}
-          <div className="relative animate-in fade-in slide-in-from-bottom duration-1000 ease-out delay-1000">
+          <div className="relative hero-demo">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-purple-600/10 rounded-3xl blur-3xl transform -rotate-1 animate-pulse"></div>
             <div className="relative bg-white/90 backdrop-blur-md rounded-3xl border border-white/50 shadow-2xl p-6 sm:p-8 hover:shadow-3xl transition-shadow duration-500 ease-out">
               <div className="grid lg:grid-cols-2 gap-8">

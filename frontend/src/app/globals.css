@@ -116,3 +116,63 @@ body {
   height: 8px;
   border-radius: 4px;
 }
+
+/* Hero Section Entrance Animations */
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation Classes for Hero Text */
+.hero-header {
+  animation: slideInFromTop 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.hero-badge {
+  animation: slideInFromBottom 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.hero-title {
+  animation: slideInFromBottom 1s ease-out 0.4s forwards;
+  opacity: 0;
+}
+
+.hero-description {
+  animation: slideInFromBottom 1s ease-out 0.6s forwards;
+  opacity: 0;
+}
+
+.hero-demo {
+  animation: fadeInScale 1s ease-out 0.8s forwards;
+  opacity: 0;
+}
