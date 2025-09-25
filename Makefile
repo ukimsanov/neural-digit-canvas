@@ -77,13 +77,25 @@ train-quick: ## Quick training for testing (2 epochs)
 	@echo "$(GREEN)Quick training (2 epochs)...$(RESET)"
 	$(PYTHON) train.py --model both --epochs 2 --output-dir $(OUTPUT_DIR)
 
-demo: ## Launch Gradio web demo
-	@echo "$(GREEN)Launching Gradio demo...$(RESET)"
-	$(PYTHON) app.py
+frontend: ## Launch Next.js frontend
+	@echo "$(GREEN)Launching Next.js frontend...$(RESET)"
+	cd frontend && npm run dev
+
+frontend-build: ## Build Next.js for production
+	@echo "$(GREEN)Building Next.js for production...$(RESET)"
+	cd frontend && npm run build
+
+frontend-install: ## Install frontend dependencies
+	@echo "$(GREEN)Installing frontend dependencies...$(RESET)"
+	cd frontend && npm install
 
 api: ## Launch FastAPI service
 	@echo "$(GREEN)Launching FastAPI service...$(RESET)"
 	uvicorn api:app --reload --host 0.0.0.0 --port 8000
+
+run: ## Run both API and frontend services
+	@echo "$(GREEN)Starting MNIST Classifier...$(RESET)"
+	./run.sh
 
 docker-build: ## Build Docker images
 	@echo "$(GREEN)Building Docker images...$(RESET)"
@@ -93,8 +105,9 @@ docker-up: ## Start Docker services
 	@echo "$(GREEN)Starting Docker services...$(RESET)"
 	$(DOCKER_COMPOSE) up -d
 	@echo "$(BLUE)Services available at:$(RESET)"
+	@echo "  - Frontend: http://localhost:3000"
 	@echo "  - API: http://localhost:8000"
-	@echo "  - Web Demo: http://localhost:7860"
+	@echo "  - API Docs: http://localhost:8000/docs"
 
 docker-down: ## Stop Docker services
 	@echo "$(YELLOW)Stopping Docker services...$(RESET)"
