@@ -32,7 +32,10 @@ services:
     ports:
       - "3000:3000"
     environment:
+      # For local development
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+      # For VM deployment, change to: http://YOUR_PUBLIC_IP:8000
+      # For production with domain: https://yourdomain.com/api
     depends_on:
       - api
     restart: unless-stopped
