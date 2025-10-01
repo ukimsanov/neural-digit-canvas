@@ -5,13 +5,6 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [],
   },
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        "@": "./src",
-      },
-    },
-  },
 };
 
 export default nextConfig;
