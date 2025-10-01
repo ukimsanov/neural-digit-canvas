@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import DrawingCanvas, { DrawingCanvasRef } from '@/components/DrawingCanvas';
 import PredictionResult from '@/components/PredictionResult';
 import ModelSelector from '@/components/ModelSelector';
+import ApiLoadingOverlay from '@/components/ApiLoadingOverlay';
 import { mnistAPI, PredictionResponse } from '@/lib/api';
 import { canvasToBlob, preprocessCanvas } from '@/lib/utils';
 import { Eraser, Sparkles, Github, Activity } from 'lucide-react';
@@ -15,15 +16,33 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
 
-  // Check API status after header animation completes
+  // Check API status with cold start handling
   useEffect(() => {
-    // Delay API check until after header animation (0.8s) completes
-    const timer = setTimeout(() => {
-      mnistAPI.healthCheck()
-        .then(() => setApiStatus('online'))
-        .catch(() => setApiStatus('offline'));
-    }, 1000); // Wait 1 second to ensure animation is complete
+    let retryCount = 0;
+    const maxRetries = 30; // Try for up to 60 seconds (30 * 2s)
+    
+    const checkApiWithRetry = async () => {
+      try {
+        await mnistAPI.healthCheck();
+        setApiStatus('online');
+        // Small delay to show the overlay briefly even on fast connections
+        setTimeout(() => setShowLoadingOverlay(false), 500);
+      } catch (error) {
+        retryCount++;
+        if (retryCount >= maxRetries) {
+          setApiStatus('offline');
+          setShowLoadingOverlay(false);
+        } else {
+          // Retry every 2 seconds
+          setTimeout(checkApiWithRetry, 2000);
+        }
+      }
+    };
+
+    // Start checking after a brief delay for smooth animations
+    const timer = setTimeout(checkApiWithRetry, 1000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -39,6 +58,13 @@ export default function Home() {
 
     setIsLoading(true);
     setError(null);
+    
+    // If API is not online, show appropriate message
+    if (apiStatus !== 'online') {
+      setError('API is not available. Please wait for the backend to start.');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Preprocess the canvas to 28x28
@@ -65,6 +91,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Loading Overlay for API Cold Start */}
+      <ApiLoadingOverlay isVisible={showLoadingOverlay} />
+      
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 hero-header">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -196,8 +225,7 @@ export default function Home() {
           {apiStatus === 'offline' && (
             <div className="mb-4 sm:mb-6 p-4 bg-red-50 border border-red-200 rounded-xl" role="alert" aria-live="polite">
               <p className="text-red-700 text-sm sm:text-base">
-                ⚠️ API is offline. Please start the FastAPI backend server:
-                <code className="ml-2 px-2 py-1 bg-red-100 rounded text-xs sm:text-sm font-mono">python api.py</code>
+                ⚠️ API is offline. Please wait a little bit more for the FastAPI backend server to start
               </p>
             </div>
           )}
