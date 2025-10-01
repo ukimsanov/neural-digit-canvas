@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import DrawingCanvas, { DrawingCanvasRef } from '@/components/DrawingCanvas';
-import PredictionResult from '@/components/PredictionResult';
-import ModelSelector from '@/components/ModelSelector';
-import { mnistAPI, PredictionResponse } from '@/lib/api';
-import { canvasToBlob, preprocessCanvas } from '@/lib/utils';
+import DrawingCanvas, { DrawingCanvasRef } from '../components/DrawingCanvas';
+import PredictionResult from '../components/PredictionResult';
+import ModelSelector from '../components/ModelSelector';
+import { mnistAPI, PredictionResponse } from '../lib/api';
+import { canvasToBlob, preprocessCanvas } from '../lib/utils';
 import { Eraser, Sparkles, Github, Activity } from 'lucide-react';
 
 export default function Home() {

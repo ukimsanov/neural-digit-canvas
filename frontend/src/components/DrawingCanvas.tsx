@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 interface DrawingCanvasProps {
   className?: string;

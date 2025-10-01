@@ -3,8 +3,8 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { TrendingUp, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { PredictionResponse } from '@/lib/api';
+import { cn } from '../lib/utils';
+import { PredictionResponse } from '../lib/api';
 
 interface PredictionResultProps {
   prediction: PredictionResponse | null;
