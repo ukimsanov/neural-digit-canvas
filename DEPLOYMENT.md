@@ -37,6 +37,8 @@ This guide explains how to deploy the MNIST Classifier monorepo with Next.js fro
      - **Build Command**: `pip install -r requirements.txt`
      - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
      - **Plan**: Free
+     - **Auto-Deploy**: Yes (enables GitHub status updates)
+     - **GitHub Integration**: Enable commit status updates
 
 4. **Deploy**
    - Click "Create Web Service"

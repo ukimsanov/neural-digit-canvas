@@ -1,13 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm install",
-  "framework": "nextjs",
+  "functions": {
+    "frontend/src/app/**": {
+      "runtime": "@vercel/next"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-backend.onrender.com/api/:path*"
+      "destination": "https://mnist-classifier-api.onrender.com/:path*"
     }
   ],
   "headers": [
