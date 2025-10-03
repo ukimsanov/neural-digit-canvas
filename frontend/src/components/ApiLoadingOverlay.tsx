@@ -45,7 +45,7 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
   if (!isVisible) return null;
 
   const CurrentIcon = messages[currentMessage].icon;
-  const progress = Math.min((secondsElapsed / 90) * 100, 100); // PyTorch Lambda cold start ~60-90s
+  const progress = Math.min((secondsElapsed / 14) * 100, 100); // Lambda cold start ~8-14s
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -87,7 +87,7 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-blue-50 rounded-xl p-3">
             <div className="text-blue-700 font-semibold text-sm">Expected Time</div>
-            <div className="text-blue-900 text-xs">60-90 seconds</div>
+            <div className="text-blue-900 text-xs">8-14 seconds</div>
           </div>
           <div className="bg-green-50 rounded-xl p-3">
             <div className="text-green-700 font-semibold text-sm">Platform</div>
@@ -97,12 +97,12 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
 
         {/* Why this happens */}
         <div className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
-          <strong>Why the wait?</strong> AWS Lambda is loading PyTorch (700MB) and initializing neural network models.
+          <strong>Why the wait?</strong> AWS Lambda is initializing and loading the neural network models.
           This only happens on cold starts. Subsequent requests will be instant!
         </div>
 
-        {/* Skip button after 100 seconds */}
-        {secondsElapsed > 100 && onClose && (
+        {/* Skip button after 20 seconds */}
+        {secondsElapsed > 20 && onClose && (
           <button
             onClick={onClose}
             className="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
