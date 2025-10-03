@@ -97,7 +97,7 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
 
         {/* Why this happens */}
         <div className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
-          <strong>Why the wait?</strong> AWS Lambda experiences a "cold start" when the function hasn't been used recently.
+          <strong>Why the wait?</strong> AWS Lambda experiences a &quot;cold start&quot; when the function hasn&apos;t been used recently.
           Subsequent requests will be much faster!
         </div>
 

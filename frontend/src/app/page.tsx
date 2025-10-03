@@ -29,7 +29,7 @@ export default function Home() {
         setApiStatus('online');
         // Small delay to show the overlay briefly even on fast connections
         setTimeout(() => setShowLoadingOverlay(false), 500);
-      } catch (error) {
+      } catch {
         retryCount++;
         if (retryCount >= maxRetries) {
           setApiStatus('offline');
