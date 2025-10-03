@@ -21,7 +21,7 @@ export default function Home() {
   // Check API status with cold start handling
   useEffect(() => {
     let retryCount = 0;
-    const maxRetries = 30; // Try for up to 60 seconds (30 * 2s)
+    const maxRetries = 50; // Try for up to 100 seconds (50 * 2s)
     
     const checkApiWithRetry = async () => {
       try {

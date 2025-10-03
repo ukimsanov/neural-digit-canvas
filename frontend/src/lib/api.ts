@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 120000, // 120 seconds timeout (Lambda can take up to 180s, but we want to fail faster)
 });
 
 export interface PredictionResponse {
