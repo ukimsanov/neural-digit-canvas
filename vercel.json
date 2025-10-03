@@ -5,12 +5,7 @@
       "runtime": "@vercel/next"
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://mnist-classifier-api.onrender.com/:path*"
-    }
-  ],
+
   "headers": [
     {
       "source": "/(.*)",
