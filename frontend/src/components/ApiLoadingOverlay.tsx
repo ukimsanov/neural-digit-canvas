@@ -13,9 +13,9 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
   const [secondsElapsed, setSecondsElapsed] = useState(0);
 
   const messages = [
-    { icon: Activity, text: "Waking up the backend API..." },
+    { icon: Activity, text: "Initializing AWS Lambda function..." },
     { icon: Zap, text: "Loading PyTorch models..." },
-    { icon: Clock, text: "Almost ready! This may take up to 60 seconds..." },
+    { icon: Clock, text: "Cold start in progress..." },
     { icon: Activity, text: "Preparing neural networks..." },
   ];
 
@@ -45,7 +45,7 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
   if (!isVisible) return null;
 
   const CurrentIcon = messages[currentMessage].icon;
-  const progress = Math.min((secondsElapsed / 60) * 100, 100);
+  const progress = Math.min((secondsElapsed / 15) * 100, 100); // AWS Lambda cold start ~10-15s
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -87,22 +87,22 @@ const ApiLoadingOverlay: React.FC<ApiLoadingOverlayProps> = ({ isVisible, onClos
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-blue-50 rounded-xl p-3">
             <div className="text-blue-700 font-semibold text-sm">Expected Time</div>
-            <div className="text-blue-900 text-xs">30-60 seconds</div>
+            <div className="text-blue-900 text-xs">5-15 seconds</div>
           </div>
           <div className="bg-green-50 rounded-xl p-3">
             <div className="text-green-700 font-semibold text-sm">Platform</div>
-            <div className="text-green-900 text-xs">Render.com</div>
+            <div className="text-green-900 text-xs">AWS Lambda</div>
           </div>
         </div>
 
         {/* Why this happens */}
         <div className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
-          <strong>Why the wait?</strong> Free tier backends sleep after 15 minutes of inactivity. 
-          This is normal and only happens on the first request.
+          <strong>Why the wait?</strong> AWS Lambda experiences a "cold start" when the function hasn't been used recently.
+          Subsequent requests will be much faster!
         </div>
 
-        {/* Skip button after 15 seconds */}
-        {secondsElapsed > 15 && onClose && (
+        {/* Skip button after 20 seconds */}
+        {secondsElapsed > 20 && onClose && (
           <button
             onClick={onClose}
             className="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
