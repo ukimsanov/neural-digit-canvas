@@ -55,8 +55,8 @@ app = FastAPI(
 # Add CORS middleware (optimized for Lambda)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://neural-digit-canvas.vercel.app", "http://localhost:3000"],
-    allow_credentials=True,
+    allow_origins=["https://neural-digit-canvas.vercel.app"],
+    allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
