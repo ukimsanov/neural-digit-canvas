@@ -2,7 +2,6 @@
 """FastAPI service for MNIST classifier."""
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import torch
 import torch.nn.functional as F
@@ -52,14 +51,8 @@ app = FastAPI(
     version="0.2.0"
 )
 
-# Add CORS middleware (optimized for Lambda)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://neural-digit-canvas.vercel.app"],
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
-)
+# CORS is handled by Lambda Function URL configuration
+# No middleware needed here to avoid duplicate headers
 
 
 class ModelService:
