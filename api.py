@@ -52,13 +52,13 @@ app = FastAPI(
     version="0.2.0"
 )
 
-# Add CORS middleware
+# Add CORS middleware (optimized for Lambda)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://neural-digit-canvas.vercel.app"],
+    allow_origins=["https://neural-digit-canvas.vercel.app", "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
@@ -72,7 +72,50 @@ class ModelService:
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))
         ])
-        self.load_models()
+        # Don't load models on init - load them on demand
+
+    def get_model(self, model_type: str):
+        """Get model with lazy loading."""
+        if model_type not in self.models:
+            self.load_model(model_type)
+        return self.models.get(model_type)
+
+    def load_model(self, model_type: str):
+        """Load a specific model on demand."""
+        if model_type == 'cnn':
+            paths = [
+                "outputs/cnn/checkpoints/best_model.pth",
+                "outputs/cnn/final_model.pth"
+            ]
+            for path in paths:
+                if Path(path).exists():
+                    model = CNNClassifier()
+                    checkpoint = torch.load(path, map_location='cpu')
+                    if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+                        model.load_state_dict(checkpoint['model_state_dict'])
+                    else:
+                        model.load_state_dict(checkpoint)
+                    model.eval()
+                    self.models['cnn'] = model
+                    print(f"Loaded CNN model from {path}")
+                    return
+        elif model_type == 'linear':
+            paths = [
+                "outputs/linear/checkpoints/best_model.pth",
+                "outputs/linear/final_model.pth"
+            ]
+            for path in paths:
+                if Path(path).exists():
+                    model = LinearClassifier()
+                    checkpoint = torch.load(path, map_location='cpu')
+                    if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+                        model.load_state_dict(checkpoint['model_state_dict'])
+                    else:
+                        model.load_state_dict(checkpoint)
+                    model.eval()
+                    self.models['linear'] = model
+                    print(f"Loaded Linear model from {path}")
+                    return
 
     def load_models(self):
         """Load pre-trained models."""
@@ -150,10 +193,9 @@ class ModelService:
         top_k: int = 3
     ) -> Dict:
         """Make prediction on image."""
-        if model_type not in self.models:
+        model = self.get_model(model_type)
+        if model is None:
             raise ValueError(f"Model type {model_type} not available")
-
-        model = self.models[model_type]
 
         # Preprocess image
         image_tensor = self.preprocess_image(image)
@@ -253,10 +295,9 @@ async def list_models():
 @app.get("/model/{model_type}/info")
 async def model_info(model_type: str):
     """Get detailed information about a specific model."""
-    if model_type not in model_service.models:
+    model = model_service.get_model(model_type)
+    if model is None:
         raise HTTPException(status_code=404, detail=f"Model {model_type} not found")
-
-    model = model_service.models[model_type]
 
     # Get model architecture details
     layers = []
@@ -276,6 +317,14 @@ async def model_info(model_type: str):
         "layers": layers
     }
 
+
+# AWS Lambda handler using Mangum
+try:
+    from mangum import Mangum
+    handler = Mangum(app, lifespan="off")
+except ImportError:
+    # Mangum not installed, likely running locally
+    handler = None
 
 if __name__ == "__main__":
     import uvicorn
