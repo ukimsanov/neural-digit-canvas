@@ -1,0 +1,71 @@
+# Exclude development and build files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Exclude documentation and config files
+*.md
+*.rst
+*.txt
+!requirements.txt
+!requirements-lambda.txt
+LICENSE
+.gitignore
+.dockerignore
+
+# Exclude frontend completely 
+frontend/
+
+# Exclude test files
+tests/
+*_test.py
+test_*.py
+
+# Exclude development data
+data/MNIST/raw/*.gz
+data/MNIST/raw/t10k-*
+data/MNIST/raw/train-*
+
+# Exclude unnecessary output files (keep only essential models)
+outputs/cnn/training_history.png
+outputs/cnn/confusion_matrix.png
+outputs/linear/training_history.png
+outputs/linear/confusion_matrix.png
+outputs/cnn/checkpoints/checkpoint_epoch_*.pth
+outputs/linear/checkpoints/checkpoint_epoch_*.pth
+
+# Exclude development scripts
+train.py
+inference.py
+*.sh
+*.bat
+Makefile
+setup.py
+vercel.json
+run.sh
+run.bat
+setup-vm.sh
+
+# Exclude Jupyter notebook
+*.ipynb
+*.ipynb_checkpoints
+
+# Exclude other build/package files
+*.egg-info/
+build/
+dist/
