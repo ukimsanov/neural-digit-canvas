@@ -330,12 +330,106 @@ docker-compose up --scale api=3
 docker-compose logs -f api
 
 # Clean shutdown
+# Clean shutdown
 docker-compose down --volumes
 ```
 
 ### **Production Configuration**
 - **Resource Limits**: CPU and memory constraints configured
 - **Health Checks**: Automatic service monitoring and restart
+- **Volume Persistence**: Model checkpoints and data preserved
+- **Multi-Stage Builds**: Optimized image sizes for deployment
+
+## ☁️ AWS Lambda Deployment (Serverless)
+
+Deploy the MNIST classifier API as a containerized serverless function on AWS Lambda. This enables scalable, pay-per-use inference with minimal infrastructure management.
+
+### **Step-by-Step Guide**
+
+1. **Build the Lambda-compatible Docker image**
+   ```bash
+   docker build --platform linux/amd64 --provenance=false -t <your_ecr_repo>:vX .
+   ```
+
+2. **Push to AWS ECR (Elastic Container Registry)**
+   ```bash
+   # Authenticate Docker to ECR
+   aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <your_ecr_repo>
+   
+   # Push image
+   docker push <your_ecr_repo>:vX
+   ```
+
+3. **Create/Update Lambda Function**
+   - In AWS Console, create a Lambda function with type "Container image"
+   - Set the image URI to your ECR image (e.g., `114059502095.dkr.ecr.us-east-1.amazonaws.com/mnist-classifier:v8`)
+   - Set memory to at least **3008 MB** and timeout to **180 seconds**
+
+4. **Enable Lambda Function URL**
+   - In Lambda settings, enable Function URL for public access
+   - Configure CORS to allow your frontend origin (e.g., `https://neural-digit-canvas.vercel.app`)
+
+5. **CORS Configuration**
+   - ⚠️ **Important**: Do NOT use FastAPI's `CORSMiddleware` in `api.py` (let Lambda handle CORS)
+   - Lambda Function URL and FastAPI middleware both adding headers causes "multiple origins" error
+   - Only one `Access-Control-Allow-Origin` header should be present
+
+6. **Connect Frontend**
+   - Set `NEXT_PUBLIC_API_URL` environment variable in your frontend to the Lambda Function URL
+   - Example: `https://yohvwh25qifzy22ny6o3qtnp5i0vmmvg.lambda-url.us-east-1.on.aws/`
+
+### **Cold Start Performance**
+
+⏱️ **Expected Cold Start Times**: 60-100 seconds
+
+**Why so long?**
+- PyTorch container images are **large (~700MB+)** 
+- Lambda must download and extract the image on first invocation
+- PyTorch imports alone take 5-10 seconds
+- Model initialization adds additional overhead
+
+**Performance Characteristics:**
+- **Cold Start** (first request after inactivity): 60-100 seconds
+- **Warm Start** (subsequent requests): <1 second
+- **Warm Duration**: Functions stay warm for ~15 minutes after last invocation
+
+**Optimization Options:**
+- ✅ Use CPU-only PyTorch (`torch==2.8.0+cpu`) - already implemented
+- ✅ Lazy model loading (load on first request, not at import) - already implemented
+- 💰 [Provisioned Concurrency](https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html) - keeps functions warm (extra cost ~$0.015/hour per GB)
+- 🔧 Reduce image size by removing unnecessary dependencies
+
+### **Troubleshooting**
+
+**CORS Errors**: `Access-Control-Allow-Origin cannot contain more than one origin`
+- **Cause**: Both Lambda Function URL CORS and FastAPI's `CORSMiddleware` adding duplicate headers
+- **Solution**: Remove `CORSMiddleware` from `api.py`, configure CORS only in Lambda Function URL settings
+
+**Long Cold Starts**: Request times out or takes >60 seconds
+- **Cause**: Large PyTorch image, model loading during initialization
+- **Solution**: Increase Lambda timeout to 180s, optimize Docker image, consider Provisioned Concurrency
+
+**Init Timeout**: Lambda logs show `Phase: init Status: timeout`
+- **Cause**: Heavy imports (PyTorch) taking >10 seconds during init phase
+- **Solution**: Move imports inside handler functions where possible, use lazy loading
+
+### **Cost Estimation**
+
+Lambda pricing (as of 2025):
+- **Compute**: $0.0000166667 per GB-second
+- **Requests**: $0.20 per 1M requests
+- **Example**: 1000 predictions/day at 3GB memory, 2s execution
+  - Compute: 1000 × 3GB × 2s × $0.0000166667 = ~$0.10/day
+  - Requests: 1000 × $0.0000002 = ~$0.0002/day
+  - **Total**: ~$3/month (without Provisioned Concurrency)
+
+### **Live Demo**
+
+🌐 **Frontend**: https://neural-digit-canvas.vercel.app  
+📡 **Lambda API**: https://yohvwh25qifzy22ny6o3qtnp5i0vmmvg.lambda-url.us-east-1.on.aws/
+
+## � CI/CD Pipeline
+```
 - **Volume Persistence**: Model checkpoints and data preserved
 - **Multi-Stage Builds**: Optimized image sizes for deployment
 
@@ -375,21 +469,15 @@ docker-compose down --volumes
 ### **Future Enhancements** 
 - [ ] **Model Optimization**: ONNX export for cross-platform deployment
 - [ ] **Monitoring**: Prometheus metrics and Grafana dashboards  
-- [ ] **Advanced Architectures**: Vision Transformer implementation
-- [ ] **MLOps**: Weights & Biases integration for experiment tracking
-
 ## 🤝 Contributing
 
 This project welcomes contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
-
-### **Development Workflow**
 ```bash
 # Setup development environment
 git clone https://github.com/ukimsanov/mnist-linear-classifier.git
 cd mnist-linear-classifier
 make install-dev
 
-# Run tests before making changes
 make test && make lint
 
 # Make your changes...
