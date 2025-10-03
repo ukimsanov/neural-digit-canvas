@@ -1,6 +1,6 @@
 <div align="center">
 
-# �� Neural Digit Canvas
+# Neural Digit Canvas
 
 ### *From hand-drawn sketches to AI predictions in milliseconds*
 
