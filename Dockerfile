@@ -1,46 +1,27 @@
-# Multi-stage build for efficient image
-FROM python:3.10-slim as builder
+# Use the official AWS Lambda Python 3.12 base image (2025 latest)
+FROM public.ecr.aws/lambda/python:3.12
 
-# Set working directory
-WORKDIR /app
+# Set environment variables for Python optimization
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+# Copy requirements and install dependencies
+COPY requirements.txt ${LAMBDA_TASK_ROOT}/
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
-# Copy requirements
-COPY requirements.txt .
+# Copy application source code
+COPY api.py ${LAMBDA_TASK_ROOT}/
+COPY src/ ${LAMBDA_TASK_ROOT}/src/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Copy trained models (only the best models to minimize size)
+RUN mkdir -p ${LAMBDA_TASK_ROOT}/outputs/cnn/checkpoints
+RUN mkdir -p ${LAMBDA_TASK_ROOT}/outputs/linear/checkpoints
 
-# Final stage
-FROM python:3.10-slim
+# Copy only the best/final models - not all checkpoints
+COPY outputs/cnn/final_model.pth ${LAMBDA_TASK_ROOT}/outputs/cnn/final_model.pth
+COPY outputs/cnn/checkpoints/best_model.pth ${LAMBDA_TASK_ROOT}/outputs/cnn/checkpoints/best_model.pth
+COPY outputs/linear/final_model.pth ${LAMBDA_TASK_ROOT}/outputs/linear/final_model.pth
+COPY outputs/linear/checkpoints/best_model.pth ${LAMBDA_TASK_ROOT}/outputs/linear/checkpoints/best_model.pth
 
-# Set working directory
-WORKDIR /app
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    libgomp1 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy Python dependencies from builder
-COPY --from=builder /root/.local /root/.local
-
-# Make sure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH
-
-# Copy application code
-COPY . .
-
-# Create outputs directory
-RUN mkdir -p outputs
-
-# Expose ports
-EXPOSE 8000 7860
-
-# Default command (can be overridden)
-CMD ["python", "api.py"]
+# Set the Lambda function handler
+CMD ["api.handler"]
